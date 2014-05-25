@@ -3,9 +3,11 @@
 import urllib, urllib2, re, json
 # custom libs
 import requests
+from anjuke import pinyin
 from lxml.html import fromstring
 next_page_str = u"\u4e0b\u4e00\u9875"
 max_provid = 32
+pinyin_c = pinyin.Converter()
 
 def parse_school_name(node):
 	a_list = node.xpath('./a')
@@ -16,10 +18,12 @@ def parse_school_name(node):
 def parse_school_node(node):
 	td_list = node.xpath('./td')
 	name = parse_school_name(td_list[0])
-	location = td_list[1].text_content();
-	category = td_list[2].text_content();
-	level = td_list[5].text_content();
-	return {'name': name, 'location': location, 'category': category, 'level': level}
+	location = td_list[1].text_content()
+	category = td_list[2].text_content()
+	level = td_list[5].text_content()
+	fl = pinyin_c.convert(name, fmt='fl', sc=False)
+	fpy = pinyin_c.convert(name, sc=False)
+	return {'name': name, 'location': location, 'category': category, 'level': level, 'firstletter': fl, 'pinyin': fpy}
 
 def parse_page(provid, page):
 	url = 'http://kaoshi.edu.sina.com.cn/collegedb/collegelist.php?provid={0}&page={1}'.format(provid, page)
@@ -54,11 +58,14 @@ def create_avos_college(college_dict):
 	r = requests.post(url, json.dumps(college_dict), headers=headers)
 	print r.text
 
-
 if __name__ == '__main__':
 	li = list()
 	for x in xrange(1, max_provid + 1):
 		li.extend(parse_prov(x))
+	for idx, c in enumerate(li):
+		c['cid'] = idx + 1001;
 	print len(li)
-	for d in li:
-		create_avos_college(d)
+	with open('college_list.json', 'w') as outfile:
+		json.dump(li, outfile)
+	for c in li:
+		create_avos_college(c)

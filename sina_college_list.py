@@ -9,6 +9,9 @@ next_page_str = u"\u4e0b\u4e00\u9875"
 max_provid = 32
 pinyin_c = pinyin.Converter()
 
+YOUR_AVOS_APP_ID = ''
+YOUR_AVOS_APP_KEY = ''
+
 def parse_school_name(node):
 	a_list = node.xpath('./a')
 	n = node if len(a_list) == 0 else a_list[0]
@@ -51,8 +54,8 @@ def parse_prov(provid):
 
 def create_avos_college(college_dict):
 	url = 'https://cn.avoscloud.com/1/classes/College'
-	headers = {'X-AVOSCloud-Application-Id': 'p9rgqk0l024yi8uugfp1hh4blwpowjku2jl9aswolhjkmw7w', \
-	 'X-AVOSCloud-Application-Key': '1ni21qnyrbsrjzngsxyihd8c8d8rtj9abcizr9xgcvalj3p6', \
+	headers = {'X-AVOSCloud-Application-Id': YOUR_AVOS_APP_ID, \
+	 'X-AVOSCloud-Application-Key': YOUR_AVOS_APP_ID, \
 	  'Content-Type': 'application/json'}
 	print college_dict
 	r = requests.post(url, json.dumps(college_dict), headers=headers)
